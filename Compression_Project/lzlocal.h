@@ -54,7 +54,7 @@
 #define WINDOW_SIZE     (1 << OFFSET_BITS) 
 
 /* maximum match length not encoded and maximum length encoded (4 bits) */
-#define MAX_UNCODED     6
+#define MAX_UNCODED     5
 #define MAX_CODED         (1 << LENGTH_BITS)    /* + MAX_UNCODED*/
 
 /* #define SLIDE           (1 << SLIDE_BITS)  */

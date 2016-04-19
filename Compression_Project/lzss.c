@@ -269,8 +269,7 @@ int DecodeLZSS(FILE *fpIn, FILE *fpOut)
 	encoded_string_t code;              /* offset/length code for string */
 	
 	unsigned char buffer[WINDOW_SIZE];
-	unsigned char text[
-		WINDOW_SIZE];
+	unsigned char text[WINDOW_SIZE];
 	/* use stdin if no input file */
 	if ((NULL == fpIn) || (NULL == fpOut))
 	{

@@ -28,7 +28,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 ***************************************************************************/
-#define _CRT_NONSTDC_NO_WARNINGS
 /***************************************************************************
 *                             INCLUDED FILES
 ***************************************************************************/
@@ -80,7 +79,7 @@ int main(int argc, char *argv[])
     FILE *org;             /* pointer to open input file */
     FILE *comp;            /* pointer to open output file */
 	FILE *decomp;            /* pointer to open output file */
-	printf("WINDOW_SIZE: %d  MAX_CODED: %d \n",WINDOW_SIZE,MAX_CODED);
+	printf("WINDOW_SIZE: %d  MAX_CODED: %d MAX_UNCODED: %d \n",WINDOW_SIZE,MAX_CODED, MAX_UNCODED);
 
     /* initialize data */
     org = NULL;
