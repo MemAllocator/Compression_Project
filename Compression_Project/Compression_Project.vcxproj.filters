@@ -15,27 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\Downloads\brute.c">
+    <ClCompile Include="bitfile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Downloads\bitfile.c">
+    <ClCompile Include="brute.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Downloads\sample.c">
+    <ClCompile Include="lzss.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Downloads\lzss.c">
+    <ClCompile Include="sample.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\Downloads\bitfile.h">
+    <ClInclude Include="bitfile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\lzss.h">
+    <ClInclude Include="lzlocal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\lzlocal.h">
+    <ClInclude Include="lzss.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

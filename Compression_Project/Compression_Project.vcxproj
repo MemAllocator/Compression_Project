@@ -146,15 +146,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\Downloads\bitfile.c" />
-    <ClCompile Include="..\..\..\..\..\Downloads\brute.c" />
-    <ClCompile Include="..\..\..\..\..\Downloads\lzss.c" />
-    <ClCompile Include="..\..\..\..\..\Downloads\sample.c" />
+    <ClCompile Include="bitfile.c" />
+    <ClCompile Include="brute.c" />
+    <ClCompile Include="lzss.c" />
+    <ClCompile Include="sample.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\Downloads\bitfile.h" />
-    <ClInclude Include="..\..\..\..\..\Downloads\lzlocal.h" />
-    <ClInclude Include="..\..\..\..\..\Downloads\lzss.h" />
+    <ClInclude Include="bitfile.h" />
+    <ClInclude Include="lzlocal.h" />
+    <ClInclude Include="lzss.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
