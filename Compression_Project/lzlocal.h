@@ -41,23 +41,22 @@
 /***************************************************************************
 *                                CONSTANTS
 ***************************************************************************/
-#define ARRAY_SIZE     2000
-#define OFFSET_BITS     8
+
+#define OFFSET_BITS     15 /* problem with 7*/
 #define LENGTH_BITS     4
 #define SLIDE_BITS      4
-
 #if (((1 << (OFFSET_BITS + LENGTH_BITS + SLIDE_BITS)) - 1) > UINT_MAX)  /*  max: 28 bit*/
 #error "Size of encoded data must not exceed the size of an unsigned int"
 #endif
 
 /* We want a sliding window*/
 #define WINDOW_SIZE     (1 << OFFSET_BITS) 
-
+#define ARRAY_SIZE      (2* WINDOW_SIZE)  
+/* #define ARRAY_SIZE      4000000  */
 /* maximum match length not encoded and maximum length encoded (4 bits) */
-#define MAX_UNCODED     5
+#define MAX_UNCODED     2
 #define MAX_CODED         (1 << LENGTH_BITS)    /* + MAX_UNCODED*/
 
-/* #define SLIDE           (1 << SLIDE_BITS)  */
 
 #define ENCODED     0       /* encoded string */
 #define UNCODED     1       /* unencoded character */

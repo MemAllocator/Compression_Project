@@ -50,7 +50,6 @@
 ***************************************************************************/
 int EncodeLZSS(FILE *fpIn, FILE *fpOut);
 int DecodeLZSS(FILE *fpIn, FILE *fpOut);
-void printMatch();
 void diff(FILE *fpIn1, FILE *fpIn2);
 int Decode(FILE *fpIn, FILE *fpOut);
 #endif      /* ndef _LZSS_H */

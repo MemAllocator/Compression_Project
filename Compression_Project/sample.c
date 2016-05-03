@@ -28,6 +28,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 ***************************************************************************/
+
 /***************************************************************************
 *                             INCLUDED FILES
 ***************************************************************************/
@@ -79,8 +80,8 @@ int main(int argc, char *argv[])
     FILE *org;             /* pointer to open input file */
     FILE *comp;            /* pointer to open output file */
 	FILE *decomp;            /* pointer to open output file */
-	printf("WINDOW_SIZE: %d  MAX_CODED: %d MAX_UNCODED: %d \n",WINDOW_SIZE,MAX_CODED, MAX_UNCODED);
-
+	printf("WINDOW_SIZE: %d  MAX_CODED: %d \n",WINDOW_SIZE,MAX_CODED);
+    printf("The Project\n");
     /* initialize data */
     org = NULL;
     comp = NULL;
@@ -127,6 +128,7 @@ printf("Encoding.....\n");
 printf("\n");
 printf("Decoding.....\n");
  Decode(comp, decomp); 
+/* DecodeBU(comp, decomp); */
  printf("\n");
  printf("\n");
  /*   DecodeLZSS(fpIn, fpOut);*/
@@ -158,6 +160,7 @@ printf("Checking.....\n");
     fclose(decomp);
 
 	printf("\n");
+	
     return 0;
 }
 

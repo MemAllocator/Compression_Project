@@ -38,6 +38,8 @@
 #include <errno.h>
 #include "lzlocal.h"
 #include "bitfile.h"
+#include <stdlib.h>
+
 
 /***************************************************************************
 *                            TYPE DEFINITIONS
@@ -83,8 +85,8 @@ int EncodeLZSS(FILE *fpIn, FILE *fpOut)
 	//encoded_string_t matchData;
 	int c;
 	unsigned int i ,j;
-	unsigned int len;                       
-	unsigned int count;
+	unsigned int num_of_match;                       
+	unsigned int slide_counter;
 	unsigned int temp;
 	/* head of sliding window and lookahead */
 	unsigned int windowHead, LookHead;
@@ -121,78 +123,51 @@ int EncodeLZSS(FILE *fpIn, FILE *fpOut)
 	LookHead = 0;
 
   /************************************************************************
-    * Fill the sliding window buffer with some known vales.  DecodeLZSS must
-    * use the same values.  If common characters are used, there's an
-    * increased chance of matching to the earlier strings.
+    * Fill the Look buffer with some known vales.
     ************************************************************************/
-/*	memset(Look, ' ', MAX_CODED * sizeof(unsigned char));*/
+	memset(Look, 0 , MAX_CODED * sizeof(unsigned char));
 
-
-
-	
-	for (len = 0; len < MAX_CODED && (c = getc(fpIn)) != EOF; len++)
+	for (i = 0; i < WINDOW_SIZE && (c = getc(fpIn)) != EOF; i++)
 	{
-		Look[len] = c;
-		BitFilePutBit(UNCODED, bfpOut);
-		BitFilePutChar(c, bfpOut);
-		/*printf(" %c ",c);*/
-	}
-
-	if (0 == len)
-	{
-		return 0;    
-	}
-	
-	for (len = 0; len < WINDOW_SIZE && (c = getc(fpIn)) != EOF; len++)
-	{
-		slidingWindow[len] = c;
+		slidingWindow[i] = c;
 
 	}
-
-	if (0 == len)
+	if (i < WINDOW_SIZE) /* inFile was too short */
 	{
-		return 0;   /* inFile was too short */
+		printf("\n *********************************************\n");
+		printf("\n            inFile was too short \n");  
+	    printf("\n *********************************************\n");
+		return 0;
 	}
 
 
 	/* now encoded the rest of the file until an EOF is read */
 	while (1)
 	{
-		len = FindMatch(windowHead, LookHead);
+		num_of_match = FindMatch(windowHead, LookHead);
 
-		for( i = 0 ; i < len ; i++){ /* run over all the matches that has been found */
-			count=0;
+		for( i = 0 ; i < num_of_match ; i++){ /* run over all the matches that has been found */
+			slide_counter = 0;
 			/* check the Match for flaging characters */
 			for( j = 0 ; j < Matchs[i].length ; j++){
 				if(flagWindow[Wrap((  Matchs[i].offset + j ),WINDOW_SIZE )] == ENCODED ){
-					count++;
+					slide_counter++;
 				}
 
 			}
-			if(count == 0){
+			if(slide_counter == 0){
 			
 
 
-/*
-			if( (Matchs[i].length < MAX_CODED - 1) && (slidingWindow[Wrap((windowHead),WINDOW_SIZE)]  == slidingWindow[Wrap((Matchs[i].offset + Matchs[i].length),WINDOW_SIZE)]) && (Wrap((Matchs[i].offset + Matchs[i].length),WINDOW_SIZE) != windowHead)){ 
+				/* check if the the next round will give longer match*/
+				if( (Matchs[i].length < MAX_CODED - 1) && (slidingWindow[windowHead]  == slidingWindow[Wrap((Matchs[i].offset + Matchs[i].length),WINDOW_SIZE)]) && (Wrap((Matchs[i].offset + Matchs[i].length),WINDOW_SIZE) != windowHead) && flagWindow[windowHead]==UNCODED){ 
 				break;
 			}
-*/
+			
+				
 			if( Matchs[i].length > MAX_UNCODED ){ /*  only if the match is bigger than MAX_UNCODED we will replace it with pointer  */
 				
-				/*
-				for(j = 0; j < count; j++){*//* find slide (in case we succeced to find better match) */
-					/*if(flagWindow[Wrap((windowHead + j), WINDOW_SIZE)] == ENCODED ){
-						Matchs[i].slide++;
-					}
-				}
-				*/
-				/*
-				if( Matchs[i].length >= MAX_CODED -1){
-					Matchs[i].length = MAX_CODED - 1;
-				}
-				*/
-				for( j = 0 ; j < (Matchs[i].length ); j++){  /* find slide  */ /* j < (Matchs[i].length - count */
+				for( j = 0 ; j < (Matchs[i].length ); j++){  /* find slide  */ 
 					if(flagLook[Wrap(( LookHead + MAX_CODED - 1 - j ),MAX_CODED )] == ENCODED ){
 						Matchs[i].slide++;
 					}
@@ -200,11 +175,17 @@ int EncodeLZSS(FILE *fpIn, FILE *fpOut)
 						break;
 					}
 				}
+
+				if ( Matchs[i].slide == Matchs[i].length){ /*  Edge case, we not allowing slide = length  */
+					break;
+				}
+
 				for( j = 0 ; j < Matchs[i].length ; j++){ /*update flagWindows for the current match */ 
 					flagWindow[ Wrap(( Matchs[i].offset + j), WINDOW_SIZE)] = ENCODED;
 				}
-				temp = Wrap((Matchs[i].offset + WINDOW_SIZE - windowHead - count ),WINDOW_SIZE);
-				printf("(%d, %d ,%d) ",temp,Matchs[i].length,Matchs[i].slide); 
+				/* Writing Pointer to File */
+				temp = Wrap((Matchs[i].offset + WINDOW_SIZE - windowHead  ),WINDOW_SIZE);
+			/*	printf("(%d, %d ,%d) ", temp , Matchs[i].length,Matchs[i].slide); */
 				BitFilePutBit(ENCODED, bfpOut);
 				BitFilePutBitsNum(bfpOut, &temp, OFFSET_BITS,sizeof(unsigned int));
 				BitFilePutBitsNum(bfpOut, &(Matchs[i].length), LENGTH_BITS,sizeof(unsigned int));
@@ -261,142 +242,8 @@ int EncodeLZSS(FILE *fpIn, FILE *fpOut)
 *   Returned   : 0 for success, -1 for failure.  errno will be set in the
 *                event of a failure.
 ****************************************************************************/
-int DecodeLZSS(FILE *fpIn, FILE *fpOut)
-{
-	bit_file_t *bfpIn;
-	int c;
-	unsigned int i, index;
-	encoded_string_t code;              /* offset/length code for string */
-	
-	unsigned char buffer[WINDOW_SIZE];
-	unsigned char text[WINDOW_SIZE];
-	/* use stdin if no input file */
-	if ((NULL == fpIn) || (NULL == fpOut))
-	{
-		errno = ENOENT;
-		return -1;
-	}
-
-	/* convert input file to bitfile */
-	bfpIn = MakeBitFile(fpIn, BF_READ);
-
-	if (NULL == bfpIn)
-	{
-		perror("Making Input File a BitFile");
-		return -1;
-	}
-	for(i = 0 ; i < WINDOW_SIZE ; i++){
-		buffer[i] = 0 ;
-		text[i] = 0 ;
-	}
-	index = 0;
-	while (1)
-	{
-		
-		
-			if ((c = BitFileGetBit(bfpIn)) == EOF)
-			{
-				/* we hit the EOF */
-				break;
-			}
-
-			if (c == UNCODED)
-			{
-				/* uncoded character */
-				if ((c = BitFileGetChar(bfpIn)) == EOF)
-				{
-					break;
-				}
-				while(1){/* write the characters in the buffer if avliable*/
-				if(buffer[index] != 0){/*if ther is character in the buffer*/
-					putc(buffer[index], fpOut);
-		/*			printf(" %c ", buffer[index]);*/       
-					text[index] = buffer[index];
-					buffer[index] = 0;
-					index = Wrap((index + 1), WINDOW_SIZE);
-				}
-				else{
-					break;
-				}
-		}
 
 
-				/* write out byte and put it in sliding window */
-				putc(c, fpOut);
-				text[index] = c;
-				index = Wrap((index + 1), WINDOW_SIZE);
-				printf("%c ", c);   
-			}
-			else
-			{
-				/* offset and length */
-				code.offset = 0;
-				code.length = 0;
-				code.slide = 0;
-				if ((BitFileGetBitsNum(bfpIn, &code.offset, OFFSET_BITS,sizeof(unsigned int))) == EOF)
-				{
-					break;
-				}
-
-				if ((BitFileGetBitsNum(bfpIn, &code.length, LENGTH_BITS,sizeof(unsigned int))) == EOF)
-				{
-					break;
-				}
-				if ((BitFileGetBitsNum(bfpIn, &code.slide, SLIDE_BITS,sizeof(unsigned int))) == EOF)
-				{
-					break;
-				}
-				/* code.length += MAX_UNCODED + 1; */
-
-				/****************************************************************
-				* Write out decoded string to file and lookahead.  It would be
-				* nice to write to the sliding window instead of the lookahead,
-				* but we could end up overwriting the matching string with the
-				* new string if abs(offset - next char) < match length.
-				****************************************************************/
-				printf("(%d, %d ,%d) ",code.offset,code.length,code.slide);        
-				if(code.length > code.slide){
-					for (i = 0; i < (code.length - code.slide); i++)
-					{
-
-							buffer[Wrap((index + code.offset + code.slide + i),WINDOW_SIZE)] = text[Wrap((index + WINDOW_SIZE - code.length + code.slide + i ),WINDOW_SIZE) ];
-					}
-
-					for (; i < code.length; i++)   /* take the other chracter from buffer. this chracter still not moved to text because of the slide */
-					{
-						buffer[Wrap((index + code.offset + code.slide + i),WINDOW_SIZE)] = buffer[Wrap((index + WINDOW_SIZE - code.length + code.slide + i ),WINDOW_SIZE) ];
-					}
-			}
-				else{ /* all characters in the buffer */
-						for (i = 0; i < code.length; i++)   /* take the other chracter from buffer. this chracte */
-					{
-
-						buffer[Wrap((index + code.offset + code.slide + i),WINDOW_SIZE)] = buffer[Wrap((index + WINDOW_SIZE - code.length + code.slide + i ),WINDOW_SIZE) ];
-					}
-
-				}
-			}
-	}
-
-	/* we've decoded everything, free bitfile structure */
-	BitFileToFILE(bfpIn);
-	return 0;
-
-}
-
-void printMatch(){
-	unsigned int index=0;
-	while(1){
-		if(Matchs[index].length >0){
-			printf("(  %d , %d )", Matchs[index].offset, Matchs[index].length);
-			index++;
-		}
-		else{
-			printf("\n");
-			break;
-		}
-	}
-}
 
 void diff(FILE *fpIn1, FILE *fpIn2){
 	unsigned int C1 , C2;
@@ -422,42 +269,144 @@ void diff(FILE *fpIn1, FILE *fpIn2){
 
 }
 
-/*
-int main(){
+int Decode(FILE *fpIn, FILE *fpOut)
+{
+	float pointer_counter,avg; /*temporally*/
+	bit_file_t *bfpIn;
+	int c;
+	unsigned int i, index,size;
+	encoded_string_t code;              
+	
+	unsigned char buffer[ ARRAY_SIZE ];
+	unsigned char text[ ARRAY_SIZE ];
+	/* use stdin if no input file */
+	if ((NULL == fpIn) || (NULL == fpOut))
+	{
+		errno = ENOENT;
+		return -1;
+	}
 
-printf("WINDOW_SIZE: %d  MAX_CODED: %d \n",WINDOW_SIZE,MAX_CODED);
+	/* convert input file to bitfile */
+	bfpIn = MakeBitFile(fpIn, BF_READ);
 
+	if (NULL == bfpIn)
+	{
+		perror("Making Input File a BitFile");
+		return -1;
+	}
+	
+  /************************************************************************
+    * Fill the Look buffer with some known vales.
+    ************************************************************************/
+/*	memset(buffer, 0 , ARRAY_SIZE * sizeof(unsigned char));
+	memset(text, 0 , ARRAY_SIZE * sizeof(unsigned char));  */
+	for (index = 0; index < ARRAY_SIZE; index++){
+		buffer[index] = 0;
+		text[index] = 0;
+	}
+	index = 0;
+	pointer_counter = 0;
+	avg = 0;
+	while (1)
+	{
+		
+		
+			if ((c = BitFileGetBit(bfpIn)) == EOF)
+			{
+				/* we hit the EOF */
+				break;
+			}
 
+			if (c == UNCODED)
+			{
+				/* uncoded character */
+				if ((c = BitFileGetChar(bfpIn)) == EOF)
+				{
+					break;
+				}
+				while(buffer[index] !=  0 ){
+					putc(buffer[index], fpOut);
+					text[index]= buffer[index];
+				/*	printf("%c", buffer[index]);   */
+					buffer[index] = 0 ;
+					index = Wrap((index + 1),ARRAY_SIZE);
+				}
+				
 
-slidingWindow[0]='e';
-slidingWindow[1]='a';
-slidingWindow[2]='b';
-slidingWindow[3]='c';
-slidingWindow[4]='d';
-slidingWindow[5]='d';
-slidingWindow[6]='e';
-slidingWindow[7]='a'; 
+				/* write out byte and put it in sliding window */
+				putc(c, fpOut);
+				text[index] = c;
+			/*	printf("%c", c); */
+				index = Wrap((index + 1),ARRAY_SIZE);
 
-Look[0]='a';
-Look[1]='b';
-Look[2]='c';
-Look[3]='d';
+			}
+			else
+			{
+				pointer_counter++;
+				/* offset and length */
+				code.offset = 0;
+				code.length = 0;
+				code.slide = 0;
+				if ((BitFileGetBitsNum(bfpIn, &code.offset, OFFSET_BITS,sizeof(unsigned int))) == EOF)
+				{
+					break;
+				}
 
-FindMatch(0,0);
-printMatch();
+				if ((BitFileGetBitsNum(bfpIn, &code.length, LENGTH_BITS,sizeof(unsigned int))) == EOF)
+				{
+					break;
+				}
+				if ((BitFileGetBitsNum(bfpIn, &code.slide, SLIDE_BITS,sizeof(unsigned int))) == EOF)
+				{
+					break;
+				}
+			/*	printf("(%d, %d ,%d) ",code.offset,code.length,code.slide);        */
+			    avg += code.length;	
+				if(code.length > code.slide)
+					size = code.length - code.slide;
+				else
+					size = code.slide - code.length;
 
+				for (i = 0; i < size; i++)
+				{
+					buffer[Wrap((index + code.offset + code.slide + i),ARRAY_SIZE)] = text[Wrap((ARRAY_SIZE + index - size + i),ARRAY_SIZE) ];
+				}
+				
+				for (i = 0; i < (code.length - size) ; i++){
+
+					buffer[Wrap((index + code.offset + code.slide + i + size), ARRAY_SIZE)] = buffer[Wrap((index + i),ARRAY_SIZE)];
+					
+				}
+
+				
+
+			
+				}
+			
+	}
+
+	/* we've decoded everything, free bitfile structure */
+
+	BitFileToFILE(bfpIn);
+
+printf("there was %f pointers\n",pointer_counter);
+	printf("num of character is %f\n",avg );
+	printf("the avg is %f ",(avg / pointer_counter));	return 0;
 
 }
-*/
 
-int Decode(FILE *fpIn, FILE *fpOut)
+
+
+
+int DecodeBU(FILE *fpIn, FILE *fpOut)
 {
 	bit_file_t *bfpIn;
 	int c;
 	unsigned int i, index;
-	encoded_string_t code;              /* offset/length code for string */
+	encoded_string_t code;              
 	
-	unsigned char text[ARRAY_SIZE];
+	/*unsigned char text[ARRAY_SIZE];*/
+	unsigned char *text = (unsigned char*) malloc(sizeof(unsigned char) * ARRAY_SIZE);
 	/* use stdin if no input file */
 	if ((NULL == fpIn) || (NULL == fpOut))
 	{
@@ -523,7 +472,7 @@ int Decode(FILE *fpIn, FILE *fpOut)
 				{
 					break;
 				}
-				printf("(%d, %d ,%d) ",code.offset,code.length,code.slide);        
+			/*	printf("(%d, %d ,%d) ",code.offset,code.length,code.slide);      */  
 				
 					for (i = 0; i <code.length; i++)
 					{
