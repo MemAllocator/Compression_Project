@@ -42,7 +42,7 @@
 *                                CONSTANTS
 ***************************************************************************/
 
-#define OFFSET_BITS     15 /* problem with 7*/
+#define OFFSET_BITS     11/* problem with 7*/
 #define LENGTH_BITS     4
 #define SLIDE_BITS      4
 #if (((1 << (OFFSET_BITS + LENGTH_BITS + SLIDE_BITS)) - 1) > UINT_MAX)  /*  max: 28 bit*/
