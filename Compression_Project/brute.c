@@ -98,7 +98,7 @@ unsigned int FindMatch(const unsigned int windowHead,const unsigned int LookHead
             /* we matched one. how many more match? */
             j = 1;
 
-			while(slidingWindow[Wrap((i + (WINDOW_SIZE - j )), WINDOW_SIZE)] == Look[Wrap(((LookHead+MAX_CODED - 1) - j ), MAX_CODED)]) {
+			while(slidingWindow[Wrap((i + (WINDOW_SIZE - (j )), WINDOW_SIZE)] == Look[Wrap(((LookHead+MAX_CODED - 1) - j ), MAX_CODED)]) {
                 if (j >= MAX_CODED -1 || Wrap((i + (WINDOW_SIZE - j )), WINDOW_SIZE) == windowHead || Wrap(((LookHead+MAX_CODED - 1)  - j ), MAX_CODED) == LookHead   ){
 					/* || Wrap((i + (WINDOW_SIZE - j )), WINDOW_SIZE) == windowHead || Wrap(((LookHead+MAX_CODED - 1) + ( - j )), MAX_CODED) == LookHead ) /*
                 {                    /* we wrapped around slidingWindow */        /* we wrapped around Look */ 
