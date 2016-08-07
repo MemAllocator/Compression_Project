@@ -58,7 +58,7 @@ encoded_string_t Matchs[WINDOW_SIZE/(MAX_UNCODED+1)];*/ /* the max match could b
 *                process of mathcing uncoded strings to strings in the
 *                sliding window.  The brute force search doesn't use any
 *                special structures, so this function doesn't do anything.
-*   Parameters : None
+*   Parameters : #define Wrap
 *   Effects    : None
 *   Returned   : 0 for success, -1 for failure.  errno will be set in the
 *                event of a failure.

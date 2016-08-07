@@ -75,93 +75,93 @@ typedef enum
 *   Returned   : 0 for success, -1 for failure.  errno will be set in the
 *                event of a failure.
 ****************************************************************************/
-int main(int argc, char *argv[])
-{
-    FILE *org;             /* pointer to open input file */
-    FILE *comp;            /* pointer to open output file */
-	FILE *decomp;            /* pointer to open output file */
-	printf("WINDOW_SIZE: %d  MAX_CODED: %d \n",WINDOW_SIZE,MAX_CODED);
-    printf("The Project\n");
-    /* initialize data */
-    org = NULL;
-    comp = NULL;
-	decomp = NULL;
-	/* open input file as binary */
-                org = fopen("org.txt", "rb"); 
-                if (org == NULL)
-                {
-                    perror("Opening input file");
-				}
-
-				/* open output file as binary */
-                 comp = fopen("comp.txt", "wb"); 
-				/*fpOut = fopen("in.txt", "wb");*/
-                if (comp == NULL)
-                {
-                    perror("Opening output file");
-				}
-printf("Encoding.....\n");
-	 EncodeLZSS(org, comp); 
-/*   DecodeLZSS(fpIn, fpOut);*/
-/* remember to close files */
-    fclose(org);
-    fclose(comp);
-
-
-
-
-	/* open input file as binary */
-                comp = fopen("comp.txt", "rb"); 
-				/*fpIn = fopen("out.txt", "rb");*/
-                if (comp == NULL)
-                {
-                    perror("Opening input file");
-				}
-
-				/* open output file as binary */
-                 decomp = fopen("decomp.txt", "wb"); 
-				/*fpOut = fopen("in.txt", "wb");*/
-                if (decomp == NULL)
-                {
-                    perror("Opening output file");
-				}
-printf("\n");
-printf("Decoding.....\n");
- Decode(comp, decomp); 
-/* DecodeBU(comp, decomp); */
- printf("\n");
- printf("\n");
- /*   DecodeLZSS(fpIn, fpOut);*/
-/* remember to close files */
-    fclose(comp);
-    fclose(decomp);
-
-
-	/* open input file as binary */
-                org = fopen("org.txt", "rb"); 
-				/*fpIn = fopen("out.txt", "rb");*/
-                if (org == NULL)
-                {
-                    perror("Opening input file");
-				}
-
-				/* open output file as binary */
-                 decomp = fopen("decomp.txt", "rb"); 
-				/*fpOut = fopen("in.txt", "wb");*/
-                if (decomp == NULL)
-                {
-                    perror("Opening output file");
-				}
-printf("Checking.....\n");
- diff(org, decomp); 
- 
-/* remember to close files */
-    fclose(comp);
-    fclose(decomp);
-
-	printf("\n");
-	
-    return 0;
-}
-
+//
+//int main(int argc, char *argv[])
+//{
+//    FILE *org;             /* pointer to open input file */
+//    FILE *comp;            /* pointer to open output file */
+//	FILE *decomp;            /* pointer to open output file */
+//	printf("WINDOW_SIZE: %d  MAX_CODED: %d \n",WINDOW_SIZE,MAX_CODED);
+//    printf("The Project\n");
+//    /* initialize data */
+//    org = NULL;
+//    comp = NULL;
+//	decomp = NULL;
+//	/* open input file as binary */
+//                org = fopen("org.txt", "rb"); 
+//                if (org == NULL)
+//                {
+//                    perror("Opening input file");
+//				}
+//
+//				/* open output file as binary */
+//                 comp = fopen("comp.txt", "wb"); 
+//				/*fpOut = fopen("in.txt", "wb");*/
+//                if (comp == NULL)
+//                {
+//                    perror("Opening output file");
+//				}
+//printf("Encoding.....\n");
+//	 EncodeLZSS(org, comp); 
+///*   DecodeLZSS(fpIn, fpOut);*/
+///* remember to close files */
+//    fclose(org);
+//    fclose(comp);
+//
+//
+//
+//
+//	/* open input file as binary */
+//                comp = fopen("comp.txt", "rb"); 
+//				/*fpIn = fopen("out.txt", "rb");*/
+//                if (comp == NULL)
+//                {
+//                    perror("Opening input file");
+//				}
+//
+//				/* open output file as binary */
+//                 decomp = fopen("decomp.txt", "wb"); 
+//				/*fpOut = fopen("in.txt", "wb");*/
+//                if (decomp == NULL)
+//                {
+//                    perror("Opening output file");
+//				}
+//printf("\n");
+//printf("Decoding.....\n");
+// Decode(comp, decomp); 
+///* DecodeBU(comp, decomp); */
+// printf("\n");
+// printf("\n");
+// /*   DecodeLZSS(fpIn, fpOut);*/
+///* remember to close files */
+//    fclose(comp);
+//    fclose(decomp);
+//
+//
+//	/* open input file as binary */
+//                org = fopen("org.txt", "rb"); 
+//				/*fpIn = fopen("out.txt", "rb");*/
+//                if (org == NULL)
+//                {
+//                    perror("Opening input file");
+//				}
+//
+//				/* open output file as binary */
+//                 decomp = fopen("decomp.txt", "rb"); 
+//				/*fpOut = fopen("in.txt", "wb");*/
+//                if (decomp == NULL)
+//                {
+//                    perror("Opening output file");
+//				}
+//printf("Checking.....\n");
+// diff(org, decomp); 
+// 
+///* remember to close files */
+//    fclose(comp);
+//    fclose(decomp);
+//
+//	printf("\n");
+//	
+//    return 0;
+//}
 

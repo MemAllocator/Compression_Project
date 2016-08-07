@@ -148,11 +148,13 @@
   <ItemGroup>
     <ClCompile Include="bitfile.c" />
     <ClCompile Include="brute.c" />
+    <ClCompile Include="CompressedMatching.c" />
     <ClCompile Include="lzss.c" />
     <ClCompile Include="sample.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitfile.h" />
+    <ClInclude Include="CompressedMatching.h" />
     <ClInclude Include="lzlocal.h" />
     <ClInclude Include="lzss.h" />
   </ItemGroup>

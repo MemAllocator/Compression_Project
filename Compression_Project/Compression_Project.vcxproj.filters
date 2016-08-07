@@ -27,6 +27,9 @@
     <ClCompile Include="sample.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CompressedMatching.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitfile.h">
