@@ -75,9 +75,10 @@ typedef enum
 *   Returned   : 0 for success, -1 for failure.  errno will be set in the
 *                event of a failure.
 ****************************************************************************/
-//
+
 //int main(int argc, char *argv[])
 //{
+//	char *pat = "ddea";
 //    FILE *org;             /* pointer to open input file */
 //    FILE *comp;            /* pointer to open output file */
 //	FILE *decomp;            /* pointer to open output file */
@@ -103,6 +104,7 @@ typedef enum
 //				}
 //printf("Encoding.....\n");
 //	 EncodeLZSS(org, comp); 
+//	 CompressionMatching(decomp, pat);
 ///*   DecodeLZSS(fpIn, fpOut);*/
 ///* remember to close files */
 //    fclose(org);
@@ -164,4 +166,4 @@ typedef enum
 //	
 //    return 0;
 //}
-
+//

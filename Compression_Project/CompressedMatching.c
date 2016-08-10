@@ -12,10 +12,12 @@ int CompressionMatching(FILE *fpIn, char *pat)
 	int c;
 	unsigned int i, index;
 	encoded_string_t code;
-	char *buff;
+	unsigned char buff[WINDOW_SIZE];
+	unsigned int next[WINDOW_SIZE];
 	unsigned int current = 1;
 	unsigned int k = 1;
 	unsigned int relevant = 0;
+
 
 
 	/*unsigned char text[ARRAY_SIZE];*/
@@ -38,8 +40,11 @@ int CompressionMatching(FILE *fpIn, char *pat)
 	for (i = 1; i < WINDOW_SIZE; i++) {
 		buff[i-1] = 0;
 	}
+	for (i = 1; i < WINDOW_SIZE; i++) {
+		next[i - 1] = 0;
+	}
 	index = 0;
-	while (c = (BitFileGetBit(bfpIn)) != EOF || buff[current]!=0)
+	while (c = (BitFileGetBit(bfpIn)) != EOF || buff[current] != 0)
 	{
 
 
@@ -87,16 +92,28 @@ int CompressionMatching(FILE *fpIn, char *pat)
 					break;
 				}
 				/*	printf("(%d, %d ,%d) ",code.offset,code.length,code.slide);      */
+				if (relevant >= (current - code.length)) {
+					//copy_relevant_char();
+				}
+				else {
+					next[current + code.offset] = current + code.offset + code.length;
+					k = k + 1;
 
-				for (i = 0; i < code.length; i++)
-				{
-					buff[index + code.offset + code.slide + i] = buff[index - code.length + code.slide + i];
+				}
+				if (buff[current] != 0) {
+					//find_pat(current);
+					relevant = current;
+				}
+				if (next[current] != 0) {
+					current = next[current];
 				}
 
-			}
-	}
 
+			}
+		}
 	}
+	/*	printf("(%d, %d ,%d) ",code.offset,code.length,code.slide);      */
+
 	BitFileToFILE(bfpIn);
 	return 0;
 
@@ -181,8 +198,8 @@ void computeLPSArray(char *pat, int M, int *lps)
 // Driver program to test above function
 int main()
 {
-	char *txt = "apurba mandal loves ayoshi loves";
-	char *pat = "loves";
+	char *txt = "deabcddea";
+	char *pat = "ddea";
 	KMPSearch(pat, txt);
 	return 0;
 }
